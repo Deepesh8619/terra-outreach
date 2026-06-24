@@ -26,7 +26,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
-SHEET_ID = "15shdxey8xe0S7LFmtrvDDVFKEk34_5GTRuDwJXiJBXk"
+SHEET_ID = "1ezyBODyG5AWxCByEpgtkaZ6Ep4yJ7r2lsVFKMY694y4"
 CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send_log.csv")
 
@@ -53,8 +53,8 @@ def load_config():
     rows = config_sheet.get_all_records()
     config = {}
     for row in rows:
-        key = row.get("Setting", "").strip()
-        value = row.get("Value", "").strip()
+        key = str(row.get("Setting", "")).strip()
+        value = str(row.get("Value", "")).strip()
         if key:
             config[key] = value
     return config
