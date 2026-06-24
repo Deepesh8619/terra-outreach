@@ -65,7 +65,17 @@ def load_leads(sheet_name="Sheet1"):
     gc = get_sheet_client()
     spreadsheet = gc.open_by_key(SHEET_ID)
     sheet = spreadsheet.worksheet(sheet_name)
-    return sheet.get_all_records()
+    return sheet, sheet.get_all_records()
+
+
+def update_sent_timestamp(sheet, row_index, timestamp):
+    headers = sheet.row_values(1)
+    if "Sent At" not in headers:
+        col = len(headers) + 1
+        sheet.update_cell(1, col, "Sent At")
+    else:
+        col = headers.index("Sent At") + 1
+    sheet.update_cell(row_index, col, timestamp)
 
 
 def get_sent_emails():
@@ -214,10 +224,13 @@ st.markdown("---")
 # load leads
 leads_sheet = config.get("leads_sheet_name", "Sheet1")
 try:
-    all_leads = load_leads(leads_sheet)
+    leads_sheet_obj, all_leads = load_leads(leads_sheet)
 except Exception as e:
     st.error("Could not load leads from '" + leads_sheet + "': " + str(e))
     st.stop()
+
+for idx, lead in enumerate(all_leads):
+    lead["_row"] = idx + 2
 
 leads_with_email = [r for r in all_leads if r.get("email")]
 
@@ -314,8 +327,13 @@ if st.button("Start Campaign", type="primary", use_container_width=True):
         # send
         try:
             send_via_gmail(email, contact, subject, body_text, body_html, config)
+            ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             log_area.success("SENT: " + company + " (" + email + ") — " + subject)
             log_send(lead, subject, "sent")
+            try:
+                update_sent_timestamp(leads_sheet_obj, lead["_row"], ts)
+            except Exception:
+                pass
             sent += 1
         except Exception as e:
             log_area.error("FAILED: " + company + " — " + str(e))
