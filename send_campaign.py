@@ -16,6 +16,7 @@ Setup (one-time):
 
 import gspread
 import openai
+import re
 import smtplib
 import csv
 import os
@@ -93,11 +94,14 @@ def generate_email(lead, config):
     ai_prompt = config.get("ai_prompt", "Write a B2B outreach email for {company}")
     subject_prompt = config.get("subject_prompt", "Write a subject line for {company}")
 
+    greeting_name = contact.split(",")[0].split("/")[0].strip() if contact else company
+
     body_resp = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": ai_prompt.format(
             company=company, contact=contact, country=country,
-            angle=angle, remarks=remarks, sender_name=sender_name
+            angle=angle, remarks=remarks, sender_name=sender_name,
+            greeting_name=greeting_name
         )}],
         temperature=0.9,
         max_tokens=400,
@@ -114,10 +118,13 @@ def generate_email(lead, config):
     )
     subject = subj_resp.choices[0].message.content.strip().strip('"').strip("'")
 
+    body_text = re.sub(r'\[([^\]]+)\]\((https?://[^\)]+)\)', r'\1 (\2)', body_text)
+
     body_html = ""
     for para in body_text.split("\n\n"):
         para = para.strip()
         if para:
+            para = re.sub(r'(https?://\S+)', r'<a href="\1">\1</a>', para)
             body_html += "<p>" + para + "</p>\n"
 
     return subject, body_text, body_html
