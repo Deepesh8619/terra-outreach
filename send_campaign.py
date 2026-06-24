@@ -130,7 +130,7 @@ def send_via_gmail(to_email, to_name, subject, body_text, body_html, config):
 
     msg = MIMEMultipart("alternative")
     msg["From"] = sender_name + " <" + gmail + ">"
-    msg["To"] = (to_name + " <" + to_email + ">") if to_name else to_email
+    msg["To"] = (to_name.strip() + " <" + to_email + ">") if to_name and to_name.strip() else to_email
     msg["Subject"] = subject
     msg["Reply-To"] = gmail
 
@@ -272,8 +272,8 @@ if st.button("Start Campaign", type="primary", use_container_width=True):
 
     for i, lead in enumerate(batch):
         email = lead["email"].strip()
-        company = lead.get("Company", "?")
-        contact = lead.get("Likely Contact", company)
+        company = lead.get("Company", "")
+        contact = lead.get("Likely Contact", "") or company
 
         progress.progress((i + 1) / len(batch))
         status_text.text("Processing " + str(i+1) + "/" + str(len(batch)) + ": " + company)
