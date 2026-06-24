@@ -1,0 +1,7 @@
+credentials.json
+send_log.csv
+.env
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+outreach.db
