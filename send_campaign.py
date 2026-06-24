@@ -26,7 +26,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
-SHEET_ID = "1ezyBODyG5AWxCByEpgtkaZ6Ep4yJ7r2lsVFKMY694y4"
+SHEET_ID = "1oB1GPjGY9d8VB5lvIDkJTMfRD2rd-S9sA5ov3uR8cag"
 CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send_log.csv")
 
