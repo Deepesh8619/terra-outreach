@@ -254,7 +254,15 @@ col2.metric("Already Sent", len(sent_emails))
 col3.metric("Ready to Send", len(new_leads))
 
 if not new_leads:
-    st.success("All leads have been emailed. Add more to the sheet or clear send_log.csv to resend.")
+    st.success("All leads have been emailed.")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        if st.button("Reset & Send Again to All", type="primary", use_container_width=True):
+            if os.path.exists(LOG_FILE):
+                os.remove(LOG_FILE)
+            st.rerun()
+    with col_b:
+        st.markdown("[Add more leads in Google Sheet](https://docs.google.com/spreadsheets/d/" + SHEET_ID + ")")
     st.stop()
 
 # show lead preview
